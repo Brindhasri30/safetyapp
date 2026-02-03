@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="signup_title">Create your account</string>
+    <string name="signup_subtitle">Join us to stay safe and connected</string>
+    <string name="name_hint">Full name</string>
+    <string name="create_account_btn">Create Account</string>
+</resources>

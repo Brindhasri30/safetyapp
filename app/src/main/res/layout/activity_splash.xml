@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash"
+    android:padding="24dp">
+
+    <!-- Center container for logo and titles -->
+    <LinearLayout
+        android:id="@+id/splash_center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Single main security shield icon -->
+        <ImageView
+            android:id="@+id/app_icon"
+            android:layout_width="92dp"
+            android:layout_height="92dp"
+            android:src="@drawable/ic_shield"
+            android:contentDescription="@string/security_symbol_desc"
+            android:alpha="0.98"/>
+
+        <TextView
+            android:id="@+id/app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/app_name"
+            android:textColor="#FAFAFA"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03"
+            android:shadowColor="#66000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="2"/>
+
+        <TextView
+            android:id="@+id/app_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/splash_tagline"
+            android:textColor="#FFE0E0"
+            android:textSize="15sp"
+            android:alpha="0.98"/>
+
+        <TextView
+            android:id="@+id/loading_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/loading_label"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:alpha="0.95"/>
+    </LinearLayout>
+
+    <!-- Progress indicator near bottom for perceived loading -->
+    <ProgressBar
+        android:id="@+id/splash_progress"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:indeterminate="true"
+        android:alpha="0.9"
+        android:indeterminateTint="#FFFFFFFF"
+        android:indeterminateTintMode="src_in"/>
+
+</RelativeLayout>

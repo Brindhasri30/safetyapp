@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_title">Phone number</string>
+    <string name="login_subtitle">OTP</string>
+    <string name="phone_hint">Phone number</string>
+    <string name="otp_hint">OTP</string>
+    <string name="send_otp_btn">Send OTP</string>
+    <string name="verify_otp_btn">Verify &amp; Sign In</string>
+    <string name="login_helper">Enter your phone number; we'll send an OTP to sign in.</string>
+    <string name="signup_link">New here? Create an account</string>
+</resources>

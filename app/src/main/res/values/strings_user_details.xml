@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ud_title">User Details</string>
+    <string name="ud_name">Name</string>
+    <string name="ud_phone">Phone Number</string>
+    <string name="ud_email">Email</string>
+    <string name="ud_address">Address</string>
+    <string name="ud_guardian_title">Guardian Details</string>
+    <string name="ud_g1_name">Guardian 1 Name</string>
+    <string name="ud_g1_phone">Guardian 1 Phone</string>
+    <string name="ud_g2_name">Guardian 2 Name</string>
+    <string name="ud_g2_phone">Guardian 2 Phone</string>
+    <string name="ud_save">Save &amp; Continue</string>
+</resources>
