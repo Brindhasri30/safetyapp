@@ -30,7 +30,10 @@ class LoginActivity : AppCompatActivity() {
         btnSignUp = findViewById(R.id.btnSignUp)
 
         btnLogin.setOnClickListener { loginUser() }
-        btnSignUp.setOnClickListener { signUpUser() }
+
+        btnSignUp.setOnClickListener {
+            startActivity(Intent(this, SignUpActivity::class.java))
+        }
     }
 
     private fun loginUser() {
@@ -47,40 +50,16 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                saveLoginStatus()
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            } else {
-                Toast.makeText(this, task.exception?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    saveLoginStatus()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this, task.exception?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-    }
-
-    private fun signUpUser() {
-        val email = etEmail.text.toString().trim()
-        val password = etPassword.text.toString().trim()
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.error = "Invalid Email"
-            return
-        }
-
-        if (password.length < 6) {
-            etPassword.error = "Password must be at least 6 characters"
-            return
-        }
-
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                saveLoginStatus()
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            } else {
-                Toast.makeText(this, task.exception?.message ?: "Sign Up failed", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun saveLoginStatus() {

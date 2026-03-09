@@ -1,84 +1,83 @@
 package com.example.womensafetyapp
 
-import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var etG1: EditText
-    private lateinit var etG2: EditText
+    private lateinit var etGuardian1: EditText
+    private lateinit var etGuardian2: EditText
     private lateinit var btnSave: Button
     private lateinit var btnLogout: Button
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        etG1 = findViewById(R.id.etGuardian1)
-        etG2 = findViewById(R.id.etGuardian2)
+        etGuardian1 = findViewById(R.id.etGuardian1)
+        etGuardian2 = findViewById(R.id.etGuardian2)
         btnSave = findViewById(R.id.btnChangeGuardians)
         btnLogout = findViewById(R.id.btnLogout)
 
+        sharedPreferences = getSharedPreferences("WomenSafetyPrefs", MODE_PRIVATE)
+        auth = FirebaseAuth.getInstance()
+
+        // Load saved guardian numbers
         loadGuardians()
 
-        btnSave.setOnClickListener { saveGuardians() }
-        btnLogout.setOnClickListener { logoutUser() }
-    }
+        btnSave.setOnClickListener {
+            saveGuardians()
+        }
 
-    private fun loadGuardians() {
-        val prefs = getSharedPreferences("GUARDIANS", Context.MODE_PRIVATE)
-        etG1.setText(prefs.getString("G1", ""))
-        etG2.setText(prefs.getString("G2", ""))
+        btnLogout.setOnClickListener {
+            logoutUser()
+        }
     }
 
     private fun saveGuardians() {
-        val g1 = etG1.text.toString().trim()
-        val g2 = etG2.text.toString().trim()
 
-        if (g1.isEmpty() || g2.isEmpty()) {
+        val guardian1 = etGuardian1.text.toString()
+        val guardian2 = etGuardian2.text.toString()
+
+        if (guardian1.isEmpty() || guardian2.isEmpty()) {
             Toast.makeText(this, "Enter both guardian numbers", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Save locally
-        val prefs = getSharedPreferences("GUARDIANS", Context.MODE_PRIVATE)
-        prefs.edit().putString("G1", g1).putString("G2", g2).apply()
+        val editor = sharedPreferences.edit()
+        editor.putString("guardian1", guardian1)
+        editor.putString("guardian2", guardian2)
+        editor.apply()
 
-        // Save to Firebase
-        val userId = android.provider.Settings.Secure.getString(
-            contentResolver,
-            android.provider.Settings.Secure.ANDROID_ID
-        )
-        val database = FirebaseDatabase.getInstance()
-        val userRef = database.getReference("users").child(userId)
+        Toast.makeText(this, "Guardian numbers saved", Toast.LENGTH_SHORT).show()
+    }
 
-        val guardianData = mapOf("guardian1" to g1, "guardian2" to g2)
-        userRef.setValue(guardianData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Guardians Updated", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Firebase update failed", Toast.LENGTH_SHORT).show()
-            }
+    private fun loadGuardians() {
+
+        val guardian1 = sharedPreferences.getString("guardian1", "")
+        val guardian2 = sharedPreferences.getString("guardian2", "")
+
+        etGuardian1.setText(guardian1)
+        etGuardian2.setText(guardian2)
     }
 
     private fun logoutUser() {
-        // Clear login session
-        val prefs = getSharedPreferences("USER", MODE_PRIVATE)
-        prefs.edit().putBoolean("isLoggedIn", false).apply()
 
-        // Sign out Firebase
-        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+        auth.signOut()
 
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        finish()
+
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
     }
 }

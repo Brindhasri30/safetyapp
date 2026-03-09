@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">WomenSafetyApp</string>
-    <string name="security_symbol_desc">Security symbol</string>
+
+    <string name="splash_tagline">Stay Safe. Stay Strong.</string>
+    <string name="loading_label">Loading...</string>
+
+    <string name="security_symbol_desc">Security Shield Icon</string>
+
 </resources>

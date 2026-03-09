@@ -6,23 +6,26 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 
 class UserDetailsActivity : AppCompatActivity() {
+
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_details)
 
+        db = FirebaseFirestore.getInstance()
+
         val btnSave = findViewById<Button>(R.id.btnSave)
 
         btnSave.setOnClickListener {
-            saveToFirebase()
+            saveToFirestore()
         }
     }
 
-    private fun saveToFirebase() {
-        val db = FirebaseDatabase.getInstance().reference
+    private fun saveToFirestore() {
 
         val userData = hashMapOf(
             "name" to findViewById<EditText>(R.id.etName).text.toString(),
@@ -35,11 +38,15 @@ class UserDetailsActivity : AppCompatActivity() {
             "guardian2Phone" to findViewById<EditText>(R.id.etG2Phone).text.toString()
         )
 
-        db.child("Users").push().setValue(userData)
+        db.collection("Users")
+            .add(userData)
             .addOnSuccessListener {
-                Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Data saved successfully", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_LONG).show()
             }
     }
 }
