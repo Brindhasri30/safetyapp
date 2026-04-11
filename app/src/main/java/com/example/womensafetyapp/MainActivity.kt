@@ -17,9 +17,18 @@ import com.google.android.gms.location.*
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.sqrt
 import java.util.*
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
+
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
-
+    private val sosReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "SOS_TRIGGER") {
+                triggerSOS()
+            }
+        }
+    }
     // ---------------- UI ----------------
     private lateinit var etG1: EditText
     private lateinit var etG2: EditText
@@ -46,8 +55,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private val dangerKeywords = listOf(
         "help", "help me", "save me",
-        "emergency", "bachao", "please help"
+        "emergency", "please help"
     )
+
 
     // ==========================================================
     // ON CREATE
@@ -56,6 +66,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         etG1 = findViewById(R.id.etGuardian1)
         etG2 = findViewById(R.id.etGuardian2)
 
@@ -63,6 +74,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         findViewById<Button>(R.id.btnSave).setOnClickListener { saveGuardians() }
         findViewById<Button>(R.id.btnSOS).setOnClickListener { triggerSOS() }
+
+        val intent = Intent(this, SOSForegroundService::class.java)
+//        startForegroundService(intent)
 
         // SETTINGS BUTTON
         val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
@@ -77,7 +91,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelCurrent = SensorManager.GRAVITY_EARTH
         accelLast = SensorManager.GRAVITY_EARTH
 
-        requestPermissions()
+        if (!hasPermissions()) {
+            requestPermissions()
+        } else {
+            startAppLogic()
+        }
+    }
+    private fun hasPermissions(): Boolean {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+    private fun startAppLogic() {
         loadGuardians()
     }
 
@@ -95,10 +120,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onRequestPermissionsResult(
+
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == 101 &&
@@ -106,6 +133,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
 
             startVoiceListening()
+            startAppLogic()
         }
     }
 
@@ -120,7 +148,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
             SensorManager.SENSOR_DELAY_NORMAL
         )
-
+//        registerReceiver(sosReceiver, IntentFilter("SOS_TRIGGER"))
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.RECORD_AUDIO
@@ -133,7 +161,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(this)
-
+        try {
+            unregisterReceiver(sosReceiver)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         if (::speechRecognizer.isInitialized) {
             speechRecognizer.destroy()
         }
@@ -164,6 +196,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }, CONFIRMATION_WINDOW)
 
             checkAndTriggerSOS()
+        }
+        if (intent.getBooleanExtra("triggerSOS", false)) {
+            triggerSOS()
         }
     }
 
@@ -315,12 +350,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         } catch (e: Exception) {
             Toast.makeText(this, "SMS Error: ${e.message}", Toast.LENGTH_LONG).show()
         }
-
+        // Call Guardian 1
         callNumber(g1)
 
         Handler(Looper.getMainLooper()).postDelayed({
+
+            // Try second only after delay
             callNumber(g2)
-        }, 20000)
+
+        }, 20000) // increase delay for real-world usage
+
     }
 
     private fun callNumber(number: String) {

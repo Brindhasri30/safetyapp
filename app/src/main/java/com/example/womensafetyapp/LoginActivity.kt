@@ -36,7 +36,19 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    // 🔥 AUTO LOGIN (IMPORTANT)
+    override fun onStart() {
+        super.onStart()
+
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
+
     private fun loginUser() {
+
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
 
@@ -52,18 +64,21 @@ class LoginActivity : AppCompatActivity() {
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
+
                 if (task.isSuccessful) {
-                    saveLoginStatus()
+
+                    Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
+
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
+
                 } else {
-                    Toast.makeText(this, task.exception?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        task.exception?.message ?: "Login failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-    }
-
-    private fun saveLoginStatus() {
-        val prefs = getSharedPreferences("USER", MODE_PRIVATE)
-        prefs.edit().putBoolean("isLoggedIn", true).apply()
     }
 }

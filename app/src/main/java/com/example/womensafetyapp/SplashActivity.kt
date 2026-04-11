@@ -24,16 +24,17 @@ class SplashActivity : AppCompatActivity() {
         appIcon.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
 
         Handler(Looper.getMainLooper()).postDelayed({
-            // Check if user is already logged in
-            val prefs = getSharedPreferences("USER", MODE_PRIVATE)
-            val loggedIn = prefs.getBoolean("isLoggedIn", false)
 
-            if (loggedIn) {
+            val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+
+            if (user != null) {
                 startActivity(Intent(this, MainActivity::class.java))
             } else {
                 startActivity(Intent(this, LoginActivity::class.java))
             }
+
             finish()
+
         }, SPLASH_TIME)
     }
 }

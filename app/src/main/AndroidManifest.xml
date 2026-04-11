@@ -4,10 +4,11 @@
 
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -51,6 +52,18 @@
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.WomenSafetyApp" />
+        <service
+            android:name=".SOSForegroundService"
+            android:foregroundServiceType="microphone"
+            android:exported="false"/>
+        <receiver
+            android:name=".PowerButtonReceiver"
+            android:exported="true">
 
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON"/>
+            </intent-filter>
+
+        </receiver>
     </application>
 </manifest>
